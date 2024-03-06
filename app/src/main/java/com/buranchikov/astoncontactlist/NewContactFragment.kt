@@ -1,14 +1,12 @@
 package com.buranchikov.astoncontactlist
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.setFragmentResultListener
 import com.buranchikov.astoncontactlist.data.Contact
 import com.buranchikov.astoncontactlist.databinding.FragmentNewContactBinding
 
@@ -16,13 +14,20 @@ class NewContactFragment : Fragment() {
     private val LAST_ID = "lastId"
     private val NEW_CONTACT = "newContact"
     private val NEW_CONTACT_REQUEST = "newContactRequest"
+
+    private val OLD_CONTACT = "oldContact"
+    private val EDITED_CONTACT = "editedContact"
+    private val EDIT_CONTACT_REQUEST = "editContactRequest"
+
     val TAG = "myLog"
     lateinit var binding: FragmentNewContactBinding
-    private var id = 0
+    private var currentId = 0
     private var name = ""
     private var secondName = ""
     private var phone = ""
     private var gender = ""
+
+    private var currentContact: Contact? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -39,15 +44,38 @@ class NewContactFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        id = arguments?.getInt(LAST_ID)!!
+        //-----------------------------
+        var id = arguments?.getInt(LAST_ID)!!
+        if (id != null) {
+            binding.btnAddNewContact.text = getString(R.string.add_btn_text)
+            id++
+            currentId = id
+        }
+        currentContact = arguments?.getSerializable(OLD_CONTACT) as? Contact
 
+        currentContact?.run {
+            currentId = this.id
+            binding.btnAddNewContact.text = getString(R.string.edit_btn_text)
+            binding.etNameNew.setText(this.name)
+            binding.etSecondNameNew.setText(this.secondName)
+            binding.etPhone.setText(this.phone)
+            when (this.gender) {
+                getString(R.string.man_gender) -> binding.rbMan.isChecked = true
+                getString(R.string.woman_gender) -> binding.rbWoman.isChecked = true
+            }
+        }
 
+        //-----------------------------------
         binding.btnAddNewContact.setOnClickListener {
             name = binding.etNameNew.text.toString()
             secondName = binding.etSecondNameNew.text.toString()
             phone = binding.etPhone.text.toString()
             val newContact = Contact(
-                id = ++id, name = name, secondName = secondName, phone = phone, gender = gender
+                id = currentId,
+                name = name,
+                secondName = secondName,
+                phone = phone,
+                gender = gender
             )
             val bundle = Bundle()
             bundle.putSerializable(NEW_CONTACT, newContact)
@@ -58,24 +86,6 @@ class NewContactFragment : Fragment() {
             fragmentManager.popBackStack()
         }
     }
-
-
-//    private fun settingEditFragmentListener() {
-//        setFragmentResultListener(EDIT_CONTACT_REQUEST) { _, bundle ->
-//            if (bundle.getSerializable(OUTPUT_EDIT_CONTACT) as? Contact != null) {
-//                binding.btnAddNewContact.text = getString(R.string.edit_btn_text)
-//
-//                currentContact = arguments?.getSerializable(OUTPUT_EDIT_CONTACT) as Contact
-//                binding.etNameNew.setText(currentContact.name)
-//                binding.etSecondNameNew.setText(currentContact.secondName)
-//                binding.etPhone.setText(currentContact.phone)
-//                when (currentContact.gender) {
-//                    getString(R.string.man_gender) -> binding.rbMan.isChecked = true
-//                    getString(R.string.woman_gender) -> binding.rbWoman.isChecked = true
-//                }
-//            }
-//        }
-//    }
 
     private fun onRadioButtonClick(view: View) {
         val radioButton = view as RadioButton

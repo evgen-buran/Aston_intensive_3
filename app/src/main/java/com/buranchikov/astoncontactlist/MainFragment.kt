@@ -16,13 +16,18 @@ class MainFragment : Fragment() {
     private val LAST_ID = "lastId"
     private val NEW_CONTACT = "newContact"
     private val NEW_CONTACT_REQUEST = "newContactRequest"
-    val TAG = "myLog"
 
+    private val OLD_CONTACT = "oldContact"
+    private val EDITED_CONTACT = "editedContact"
+    private val EDIT_CONTACT_REQUEST = "editContactRequest"
+
+
+    val TAG = "myLog"
     private lateinit var binding: FragmentMainBinding
     private var contactsList = mutableListOf<Contact>()
 
-
     private val adapter = MainAdapter { contact ->
+        editContact(contact)
     }
 
     override fun onCreateView(
@@ -42,9 +47,17 @@ class MainFragment : Fragment() {
         super.onStart()
         setFragmentResultListener(NEW_CONTACT_REQUEST) { _, bundle ->
             val newContact = bundle.getSerializable(NEW_CONTACT) as Contact
-            contactsList.add(newContact)
-            Log.d(TAG, "${contactsList}")
-//            adapter.submitList(contactsList)
+            var isReplace = false
+            for (i in 0 until contactsList.size) {
+                if (contactsList[i].id == newContact.id) {
+                    contactsList[i] = newContact
+                    isReplace = true
+                }
+            }
+            Log.d(TAG, "1 - ${contactsList}")
+            if (!isReplace) contactsList.add(newContact)
+            Log.d(TAG, "2- ${contactsList}")
+            adapter.submitList(contactsList)
         }
         binding.mainRecyclerView.adapter = adapter
         adapter.submitList(contactsList)
@@ -57,6 +70,13 @@ class MainFragment : Fragment() {
     private fun createNewContact() {
         val bundle = Bundle().apply {
             putInt(LAST_ID, contactsList.size)
+        }
+        navigateFragment(bundle)
+    }
+
+    private fun editContact(contact: Contact) {
+        val bundle = Bundle().apply {
+            putSerializable(OLD_CONTACT, contact)
         }
         navigateFragment(bundle)
     }
