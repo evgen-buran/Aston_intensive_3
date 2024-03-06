@@ -3,6 +3,7 @@ package com.buranchikov.astoncontactlist
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -14,9 +15,26 @@ import com.buranchikov.astoncontactlist.databinding.ContactItemBinding
 
 class MainAdapter(private val onClickAction: (Contact) -> Unit) :
     ListAdapter<Contact, MainAdapter.ContactViewHolder>(DiffUtilContact()) {
-    val TAG = "myLog"
-    class ContactViewHolder(private val binding: ContactItemBinding) :
+    private var isSelectionModeEnabled = false
+    private val selectedContacts = mutableSetOf<Contact>()
+    fun enableSelectionMode() {
+        isSelectionModeEnabled = true
+        notifyDataSetChanged()
+    }
+
+    fun disableSelectionMode() {
+        isSelectionModeEnabled = false
+        selectedContacts.clear()
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedContacts(): Set<Contact> {
+        return selectedContacts
+    }
+
+    inner class ContactViewHolder(private val binding: ContactItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bind(contact: Contact) {
             binding.tvIdContactItem.text = "#${contact.id}"
             binding.tvNameItem.text = contact.name
@@ -27,6 +45,30 @@ class MainAdapter(private val onClickAction: (Contact) -> Unit) :
                     binding.root.resources.getDimension(R.dimen.avatar_size_big).toInt()
                 )
             }
+
+            // Показываем или скрываем чекбокс в зависимости от режима выбора
+            if (isSelectionModeEnabled) {
+                binding.checkBoxItem.visibility = View.VISIBLE
+                binding.checkBoxItem.isChecked = selectedContacts.contains(contact)
+                binding.root.setOnClickListener(null)
+                binding.checkBoxItem.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        selectedContacts.add(contact)
+                    } else {
+                        selectedContacts.remove(contact)
+                    }
+                }
+            } else {
+                binding.checkBoxItem.visibility = View.GONE
+                binding.root.setOnClickListener {
+                    val position = adapterPosition
+                    if (position != RecyclerView.NO_POSITION) {
+                        val model = getItem(position)
+                        onClickAction(model)
+                    }
+                }
+            }
+
         }
     }
 
@@ -77,4 +119,5 @@ class MainAdapter(private val onClickAction: (Contact) -> Unit) :
         }
 
     }
+
 }
