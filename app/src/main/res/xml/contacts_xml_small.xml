@@ -25,22 +25,7 @@
         <phone>+7(903)345-67-89</phone>
         <gender>Мужской</gender>
     </item>
-    <item>
-        <id>4</id>
-        <photo_url>https://placekitten.com/100/100</photo_url>
-        <first_name>Екатерина</first_name>
-        <last_name>Кузнецова</last_name>
-        <phone>+7(904)456-78-90</phone>
-        <gender>Женский</gender>
-    </item>
-    <item>
-        <id>5</id>
-        <photo_url>https://placekitten.com/100/100</photo_url>
-        <first_name>Дмитрий</first_name>
-        <last_name>Павлов</last_name>
-        <phone>+7(905)567-89-01</phone>
-        <gender>Мужской</gender>
-    </item>
+
 
 
 </resources>

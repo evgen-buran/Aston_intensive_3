@@ -2,24 +2,27 @@ package com.buranchikov.astoncontactlist
 
 import android.content.res.XmlResourceParser
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import com.buranchikov.astoncontactlist.data.Contact
 import com.buranchikov.astoncontactlist.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
-    private val CURRENT_ID = "currentID"
+    private val LAST_ID = "lastId"
+    private val NEW_CONTACT = "newContact"
     private val NEW_CONTACT_REQUEST = "newContactRequest"
-    private val EDIT_CONTACT_REQUEST = "editContactRequest"
-    private val CONTACT = "contact"
+    val TAG = "myLog"
+
     private lateinit var binding: FragmentMainBinding
     private var contactsList = mutableListOf<Contact>()
-    private val adapter = MainAdapter { contact ->
 
+
+    private val adapter = MainAdapter { contact ->
     }
 
     override fun onCreateView(
@@ -27,36 +30,38 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentMainBinding.inflate(inflater, container, false)
-
+        if (contactsList.isEmpty()) contactsList = setContactsListFromXML()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
     }
 
     override fun onStart() {
         super.onStart()
-        contactsList = setContactsList()
         setFragmentResultListener(NEW_CONTACT_REQUEST) { _, bundle ->
-            val contact = bundle.getSerializable(CONTACT) as Contact
-            contactsList.add(contact)
-            adapter.submitList(contactsList)
+            val newContact = bundle.getSerializable(NEW_CONTACT) as Contact
+            contactsList.add(newContact)
+            Log.d(TAG, "${contactsList}")
+//            adapter.submitList(contactsList)
         }
         binding.mainRecyclerView.adapter = adapter
         adapter.submitList(contactsList)
 
         binding.floatingActionButton.setOnClickListener {
-            navigateEditOrNewFragment()
+            createNewContact()
         }
     }
 
-    private fun navigateEditOrNewFragment() {
+    private fun createNewContact() {
         val bundle = Bundle().apply {
-            putInt(CURRENT_ID, contactsList.size)
+            putInt(LAST_ID, contactsList.size)
         }
+        navigateFragment(bundle)
+    }
 
+    private fun navigateFragment(bundle: Bundle) {
         val newContactFragment = NewContactFragment()
         newContactFragment.arguments = bundle
         val fragmentManager = parentFragmentManager
@@ -68,7 +73,7 @@ class MainFragment : Fragment() {
     }
 
 
-    private fun setContactsList(): MutableList<Contact> {
+    private fun setContactsListFromXML(): MutableList<Contact> {
         val dataXml = resources.getXml(R.xml.contacts_xml_small)
         val listContact = mutableListOf<Contact>()
 
