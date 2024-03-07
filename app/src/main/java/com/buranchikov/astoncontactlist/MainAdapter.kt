@@ -1,7 +1,6 @@
 package com.buranchikov.astoncontactlist
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -14,10 +13,11 @@ import com.buranchikov.astoncontactlist.databinding.ContactItemBinding
 
 class MainAdapter(private val onClickAction: (Contact) -> Unit) :
     ListAdapter<Contact, MainAdapter.ContactViewHolder>(DiffUtilContact()) {
-    val TAG = "myLog"
-    class ContactViewHolder(private val binding: ContactItemBinding) :
+
+      class ContactViewHolder(private val binding: ContactItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(contact: Contact) {
+
             binding.tvIdContactItem.text = "#${contact.id}"
             binding.tvNameItem.text = contact.name
             binding.tvSecondNameItem.text = contact.secondName
@@ -28,6 +28,10 @@ class MainAdapter(private val onClickAction: (Contact) -> Unit) :
                 )
             }
         }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return super.getItemViewType(position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {

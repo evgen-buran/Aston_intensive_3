@@ -1,5 +1,6 @@
 package com.buranchikov.astoncontactlist
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,12 +15,8 @@ class NewContactFragment : Fragment() {
     private val LAST_ID = "lastId"
     private val NEW_CONTACT = "newContact"
     private val NEW_CONTACT_REQUEST = "newContactRequest"
-
     private val OLD_CONTACT = "oldContact"
-    private val EDITED_CONTACT = "editedContact"
-    private val EDIT_CONTACT_REQUEST = "editContactRequest"
 
-    val TAG = "myLog"
     lateinit var binding: FragmentNewContactBinding
     private var currentId = 0
     private var name = ""
@@ -30,7 +27,7 @@ class NewContactFragment : Fragment() {
     private var currentContact: Contact? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentNewContactBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -51,7 +48,11 @@ class NewContactFragment : Fragment() {
             id++
             currentId = id
         }
-        currentContact = arguments?.getSerializable(OLD_CONTACT) as? Contact
+
+        currentContact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable(OLD_CONTACT, Contact::class.java)
+        } else arguments?.getSerializable(OLD_CONTACT) as? Contact
+
 
         currentContact?.run {
             currentId = this.id

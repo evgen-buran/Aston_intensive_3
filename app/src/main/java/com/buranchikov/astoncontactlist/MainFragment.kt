@@ -1,13 +1,12 @@
 package com.buranchikov.astoncontactlist
 
 import android.content.res.XmlResourceParser
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import com.buranchikov.astoncontactlist.data.Contact
 import com.buranchikov.astoncontactlist.databinding.FragmentMainBinding
@@ -16,13 +15,7 @@ class MainFragment : Fragment() {
     private val LAST_ID = "lastId"
     private val NEW_CONTACT = "newContact"
     private val NEW_CONTACT_REQUEST = "newContactRequest"
-
     private val OLD_CONTACT = "oldContact"
-    private val EDITED_CONTACT = "editedContact"
-    private val EDIT_CONTACT_REQUEST = "editContactRequest"
-
-
-    val TAG = "myLog"
     private lateinit var binding: FragmentMainBinding
     private var contactsList = mutableListOf<Contact>()
 
@@ -33,7 +26,7 @@ class MainFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         if (contactsList.isEmpty()) contactsList = setContactsListFromXML()
         return binding.root
@@ -46,17 +39,18 @@ class MainFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         setFragmentResultListener(NEW_CONTACT_REQUEST) { _, bundle ->
-            val newContact = bundle.getSerializable(NEW_CONTACT) as Contact
+           val newContact =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+              bundle.getSerializable(NEW_CONTACT, Contact::class.java)
+           } else  bundle.getSerializable(NEW_CONTACT) as Contact
+
             var isReplace = false
             for (i in 0 until contactsList.size) {
-                if (contactsList[i].id == newContact.id) {
+                if (contactsList[i].id == newContact?.id) {
                     contactsList[i] = newContact
                     isReplace = true
                 }
             }
-            Log.d(TAG, "1 - ${contactsList}")
-            if (!isReplace) contactsList.add(newContact)
-            Log.d(TAG, "2- ${contactsList}")
+            if (!isReplace) contactsList.add(newContact!!)
             adapter.submitList(contactsList)
         }
         binding.mainRecyclerView.adapter = adapter
@@ -91,10 +85,8 @@ class MainFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
-
-
     private fun setContactsListFromXML(): MutableList<Contact> {
-        val dataXml = resources.getXml(R.xml.contacts_xml_small)
+        val dataXml = resources.getXml(R.xml.contacts_xml)
         val listContact = mutableListOf<Contact>()
 
         var id = 0

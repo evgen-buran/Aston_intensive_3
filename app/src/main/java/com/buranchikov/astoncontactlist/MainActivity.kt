@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
             binding.btnDelete.visibility = View.GONE
             binding.btnCancel.visibility = View.GONE
             mainFragment.setVisibleFab(View.VISIBLE)
+            isDeleteMode = false
 
         }
     }
@@ -45,13 +46,24 @@ class MainActivity : AppCompatActivity() {
         binding.btnCancel.visibility = View.VISIBLE
         binding.btnDelete.visibility = View.VISIBLE
         mainFragment.setVisibleFab(View.INVISIBLE)
+        isDeleteMode = true
+        Toast.makeText(this, getString(R.string.unavailable_delete), Toast.LENGTH_SHORT).show()
+
         return true
     }
 
-    private fun getFragment(fragment:Fragment) {
+    private fun getFragment(fragment: Fragment) {
         fragmentManager.beginTransaction().replace(
             R.id.fragmentContainerView,
-           fragment
+            fragment
         ).commit()
+    }
+
+    companion object {
+        private var isDeleteMode = false
+
+        fun isDeleteMode(): Boolean {
+            return isDeleteMode
+        }
     }
 }

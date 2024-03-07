@@ -12,4 +12,9 @@
     <string name="man_gender">Мужской</string>
     <string name="woman_gender">Женский</string>
     <string name="edit_btn_text">Изменить контакт</string>
+    <string name="unavailable_delete">Удаление элементов временно недоступно:(</string>
+    <string name="testId">#1</string>
+    <string name="tools_name">Василий</string>
+    <string name="tools_secondName">Васильев</string>
+    <string name="tools_phone">+79222222222</string>
 </resources>
