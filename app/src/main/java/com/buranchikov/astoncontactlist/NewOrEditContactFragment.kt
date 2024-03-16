@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RadioButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import com.buranchikov.astoncontactlist.data.Contact
@@ -22,7 +21,6 @@ class NewOrEditContactFragment : Fragment() {
     private var name = ""
     private var secondName = ""
     private var phone = ""
-    private var gender = ""
 
     private var currentContact: Contact? = null
     override fun onCreateView(
@@ -34,21 +32,14 @@ class NewOrEditContactFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.rbMan.setOnClickListener { onRadioButtonClick(it) }
-        binding.rbWoman.setOnClickListener { onRadioButtonClick(it) }
-
     }
-
     override fun onStart() {
         super.onStart()
         //-----------------------------
         var id = arguments?.getInt(LAST_ID)!!
-        if (id != null) {
-            binding.btnAddNewContact.text = getString(R.string.add_btn_text)
-            id++
-            currentId = id
-        }
-
+        binding.btnAddNewContact.text = getString(R.string.add_btn_text)
+        id++
+        currentId = id
         currentContact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable(OLD_CONTACT, Contact::class.java)
         } else arguments?.getSerializable(OLD_CONTACT) as? Contact
@@ -60,13 +51,8 @@ class NewOrEditContactFragment : Fragment() {
             binding.etNameNew.setText(this.name)
             binding.etSecondNameNew.setText(this.secondName)
             binding.etPhone.setText(this.phone)
-            when (this.gender) {
-                getString(R.string.man_gender) -> binding.rbMan.isChecked = true
-                getString(R.string.woman_gender) -> binding.rbWoman.isChecked = true
-            }
         }
 
-        //-----------------------------------
         binding.btnAddNewContact.setOnClickListener {
             name = binding.etNameNew.text.toString()
             secondName = binding.etSecondNameNew.text.toString()
@@ -76,25 +62,13 @@ class NewOrEditContactFragment : Fragment() {
                 name = name,
                 secondName = secondName,
                 phone = phone,
-                gender = gender
             )
             val bundle = Bundle()
             bundle.putSerializable(NEW_CONTACT, newContact)
             setFragmentResult(NEW_CONTACT_REQUEST, bundle)
-
-
             val fragmentManager = parentFragmentManager
             fragmentManager.popBackStack()
         }
     }
 
-    private fun onRadioButtonClick(view: View) {
-        val radioButton = view as RadioButton
-        if (radioButton.isChecked) {
-            when (radioButton.text) {
-                getString(R.string.man_gender) -> gender = getString(R.string.man_gender)
-                getString(R.string.woman_gender) -> gender = getString(R.string.woman_gender)
-            }
-        }
-    }
 }

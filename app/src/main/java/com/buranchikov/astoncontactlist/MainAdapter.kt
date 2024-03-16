@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import coil.size.Scale
 import com.buranchikov.astoncontactlist.data.Contact
 import com.buranchikov.astoncontactlist.databinding.ContactItemBinding
 
@@ -22,21 +20,15 @@ class MainAdapter(private val onClickAction: (Contact) -> Unit) :
                 if (MainActivity.isDeleteMode) View.VISIBLE else View.INVISIBLE
             binding.checkBoxItem.isChecked = contact.isSelected
 
-            binding.tvIdContactItem.text = "#${contact.id}"
+            binding.tvIdContactItem.text = "${contact.id}"
             binding.tvNameItem.text = contact.name
             binding.tvSecondNameItem.text = contact.secondName
             binding.tvPhoneItem.text = contact.phone
-            binding.ivPhotoItem.load(contact.photoURL) {
-                scale(Scale.FILL).size(
-                    binding.root.resources.getDimension(R.dimen.avatar_size_big).toInt()
-                )
-            }
             binding.checkBoxItem.setOnCheckedChangeListener { _, isChecked ->
                 contact.isSelected = isChecked
             }
         }
     }
-
     override fun getItemViewType(position: Int): Int {
         return super.getItemViewType(position)
     }
@@ -74,12 +66,6 @@ class MainAdapter(private val onClickAction: (Contact) -> Unit) :
             }
             if (oldItem.phone != newItem.phone) {
                 diffBundle.putString("phone", newItem.phone)
-            }
-            if (oldItem.photoURL != newItem.photoURL) {
-                diffBundle.putString("photoURL", newItem.photoURL)
-            }
-            if (oldItem.gender != newItem.gender) {
-                diffBundle.putString("gender", newItem.gender)
             }
             return if (diffBundle.isEmpty) null else diffBundle
         }

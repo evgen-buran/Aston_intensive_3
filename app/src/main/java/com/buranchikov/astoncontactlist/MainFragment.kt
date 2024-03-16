@@ -61,7 +61,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    fun submitList() {
+    private fun submitList() {
         adapter.submitList(contactsList)
     }
 
@@ -98,11 +98,9 @@ class MainFragment : Fragment() {
         val listContact = mutableListOf<Contact>()
 
         var id = 0
-        var photoUrl = ""
         var name = ""
         var secondName = ""
         var phone = ""
-        var gender = ""
 
         while (dataXml.eventType != XmlResourceParser.END_DOCUMENT) {
             when (dataXml.eventType) {
@@ -110,19 +108,15 @@ class MainFragment : Fragment() {
                     when (dataXml.name) {
                         "item" -> {
                             id = 0
-                            photoUrl = ""
                             name = ""
                             secondName = ""
                             phone = ""
-                            gender = ""
                         }
 
                         "id" -> id = dataXml.nextText().toInt()
-                        "photo_url" -> photoUrl = dataXml.nextText()
                         "first_name" -> name = dataXml.nextText()
                         "last_name" -> secondName = dataXml.nextText()
                         "phone" -> phone = dataXml.nextText()
-                        "gender" -> gender = dataXml.nextText()
                     }
                 }
 
@@ -134,8 +128,6 @@ class MainFragment : Fragment() {
                                 name = name,
                                 secondName = secondName,
                                 phone = phone,
-                                photoURL = photoUrl,
-                                gender = gender
                             )
                         )
                     }
