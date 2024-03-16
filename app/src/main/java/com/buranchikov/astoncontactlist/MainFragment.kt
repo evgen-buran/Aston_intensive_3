@@ -39,9 +39,9 @@ class MainFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         setFragmentResultListener(NEW_CONTACT_REQUEST) { _, bundle ->
-           val newContact =  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-              bundle.getSerializable(NEW_CONTACT, Contact::class.java)
-           } else  bundle.getSerializable(NEW_CONTACT) as Contact
+            val newContact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                bundle.getSerializable(NEW_CONTACT, Contact::class.java)
+            } else bundle.getSerializable(NEW_CONTACT) as Contact
 
             var isReplace = false
             for (i in 0 until contactsList.size) {
@@ -51,19 +51,26 @@ class MainFragment : Fragment() {
                 }
             }
             if (!isReplace) contactsList.add(newContact!!)
-            adapter.submitList(contactsList)
+            submitList()
         }
         binding.mainRecyclerView.adapter = adapter
-        adapter.submitList(contactsList)
+        submitList()
 
         binding.floatingActionButton.setOnClickListener {
             createNewContact()
         }
     }
 
+    fun submitList() {
+        adapter.submitList(contactsList)
+    }
+
     private fun createNewContact() {
         val bundle = Bundle().apply {
-            putInt(LAST_ID, contactsList.size)
+            val lastId = contactsList.maxByOrNull { it.id }?.id
+            if (lastId != null) {
+                putInt(LAST_ID, lastId)
+            }
         }
         navigateFragment(bundle)
     }
@@ -76,15 +83,16 @@ class MainFragment : Fragment() {
     }
 
     private fun navigateFragment(bundle: Bundle) {
-        val newContactFragment = NewContactFragment()
-        newContactFragment.arguments = bundle
+        val newOrEditContactFragment = NewOrEditContactFragment()
+        newOrEditContactFragment.arguments = bundle
         val fragmentManager = parentFragmentManager
 
         fragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainerView, newContactFragment)
+            .replace(R.id.fragmentContainerView, newOrEditContactFragment)
             .addToBackStack(null)
             .commit()
     }
+
     private fun setContactsListFromXML(): MutableList<Contact> {
         val dataXml = resources.getXml(R.xml.contacts_xml)
         val listContact = mutableListOf<Contact>()
@@ -140,6 +148,20 @@ class MainFragment : Fragment() {
 
     fun setVisibleFab(visible: Int) {
         binding.floatingActionButton.visibility = visible
+    }
+
+    fun toggleDeleteMode() {
+        MainActivity.isDeleteMode = !MainActivity.isDeleteMode
+        adapter.notifyDataSetChanged()
+    }
+
+    fun deleteSelectedItems() {
+        val selectedItems = adapter.currentList.filter { it.isSelected }
+        contactsList.removeAll(selectedItems)
+        adapter.notifyDataSetChanged()
+    }
+    fun clearSelected(){
+        contactsList.forEach { it.isSelected = false }
     }
 
 

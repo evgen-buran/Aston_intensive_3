@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragmentManager: FragmentManager
     private val mainFragment = MainFragment()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,24 +30,32 @@ class MainActivity : AppCompatActivity() {
         binding.btnCancel.setOnClickListener {
             binding.btnDelete.visibility = View.GONE
             binding.btnCancel.visibility = View.GONE
+            mainFragment.toggleDeleteMode()
             mainFragment.setVisibleFab(View.VISIBLE)
-            isDeleteMode = false
+            mainFragment.clearSelected()
+
+        }
+        binding.btnDelete.setOnClickListener {
+            mainFragment.deleteSelectedItems()
 
         }
     }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        binding.btnCancel.visibility = View.VISIBLE
-        binding.btnDelete.visibility = View.VISIBLE
-        mainFragment.setVisibleFab(View.INVISIBLE)
-        isDeleteMode = true
-        Toast.makeText(this, getString(R.string.unavailable_delete), Toast.LENGTH_SHORT).show()
-
+        mainFragment.toggleDeleteMode()
+        if (isDeleteMode) {
+            binding.btnCancel.visibility = View.VISIBLE
+            binding.btnDelete.visibility = View.VISIBLE
+            mainFragment.setVisibleFab(View.INVISIBLE)
+        } else {
+            binding.btnCancel.visibility = View.GONE
+            binding.btnDelete.visibility = View.GONE
+            mainFragment.setVisibleFab(View.VISIBLE)
+            mainFragment.clearSelected()
+        }
         return true
     }
 
@@ -58,12 +65,7 @@ class MainActivity : AppCompatActivity() {
             fragment
         ).commit()
     }
-
     companion object {
-        private var isDeleteMode = false
-
-        fun isDeleteMode(): Boolean {
-            return isDeleteMode
-        }
+        var isDeleteMode = false
     }
 }

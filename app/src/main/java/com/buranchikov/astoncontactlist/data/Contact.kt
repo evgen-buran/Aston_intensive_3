@@ -9,4 +9,5 @@ data class Contact(
     val phone: String,
     val photoURL: String = "https://placekitten.com/100/100",
     val gender: String,
+    var isSelected: Boolean = false
 ):Serializable

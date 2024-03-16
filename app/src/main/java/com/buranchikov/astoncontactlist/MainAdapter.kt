@@ -2,6 +2,7 @@ package com.buranchikov.astoncontactlist
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -14,9 +15,12 @@ import com.buranchikov.astoncontactlist.databinding.ContactItemBinding
 class MainAdapter(private val onClickAction: (Contact) -> Unit) :
     ListAdapter<Contact, MainAdapter.ContactViewHolder>(DiffUtilContact()) {
 
-      class ContactViewHolder(private val binding: ContactItemBinding) :
+    class ContactViewHolder(private val binding: ContactItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(contact: Contact) {
+            binding.checkBoxItem.visibility =
+                if (MainActivity.isDeleteMode) View.VISIBLE else View.INVISIBLE
+            binding.checkBoxItem.isChecked = contact.isSelected
 
             binding.tvIdContactItem.text = "#${contact.id}"
             binding.tvNameItem.text = contact.name
@@ -26,6 +30,9 @@ class MainAdapter(private val onClickAction: (Contact) -> Unit) :
                 scale(Scale.FILL).size(
                     binding.root.resources.getDimension(R.dimen.avatar_size_big).toInt()
                 )
+            }
+            binding.checkBoxItem.setOnCheckedChangeListener { _, isChecked ->
+                contact.isSelected = isChecked
             }
         }
     }
@@ -47,17 +54,15 @@ class MainAdapter(private val onClickAction: (Contact) -> Unit) :
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         holder.bind(getItem(position))
-    }
 
+    }
     class DiffUtilContact : DiffUtil.ItemCallback<Contact>() {
         override fun areItemsTheSame(oldItem: Contact, newItem: Contact): Boolean {
             return oldItem.id == newItem.id
         }
-
         override fun areContentsTheSame(oldItem: Contact, newItem: Contact): Boolean {
             return oldItem == newItem
         }
-
         override fun getChangePayload(oldItem: Contact, newItem: Contact): Any? {
             val diffBundle = Bundle()
 
@@ -76,9 +81,7 @@ class MainAdapter(private val onClickAction: (Contact) -> Unit) :
             if (oldItem.gender != newItem.gender) {
                 diffBundle.putString("gender", newItem.gender)
             }
-
             return if (diffBundle.isEmpty) null else diffBundle
         }
-
     }
 }

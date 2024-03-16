@@ -11,7 +11,7 @@ import androidx.fragment.app.setFragmentResult
 import com.buranchikov.astoncontactlist.data.Contact
 import com.buranchikov.astoncontactlist.databinding.FragmentNewContactBinding
 
-class NewContactFragment : Fragment() {
+class NewOrEditContactFragment : Fragment() {
     private val LAST_ID = "lastId"
     private val NEW_CONTACT = "newContact"
     private val NEW_CONTACT_REQUEST = "newContactRequest"
