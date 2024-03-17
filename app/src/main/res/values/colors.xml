@@ -6,5 +6,6 @@
     <color name="primaryContainer">#eaddff</color>
     <color name="secondary">#625b71</color>
     <color name="outline">#79747e</color>
+    <color name="tretiary">#FFD8E4</color>
 
 </resources>
